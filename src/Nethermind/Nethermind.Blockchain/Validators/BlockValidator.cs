@@ -106,6 +106,9 @@ namespace Nethermind.Blockchain.Validators
                 if (_logger.IsDebug) _logger.Debug($"Invalid block ({block.ToString(Block.Format.FullHashAndNumber)}) tx root {txRoot} != stated tx root {block.Header.TxRoot}");
                 return false;
             }
+            
+            
+            _logger.Info($"calculated tx root: {txRoot}, block txRoot: {block.Header.TxRoot}");
 
             return true;
         }
