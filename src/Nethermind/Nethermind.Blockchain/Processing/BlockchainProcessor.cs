@@ -365,6 +365,13 @@ namespace Nethermind.Blockchain.Processing
         {
             void DeleteInvalidBlocks(Keccak invalidBlockHash)
             {
+                bool readOnly = (options & ProcessingOptions.ReadOnlyChain) != 0;
+
+                if (readOnly)
+                {
+                    return;
+                }
+                
                 for (int i = 0; i < processingBranch.BlocksToProcess.Count; i++)
                 {
                     if (processingBranch.BlocksToProcess[i].Hash == invalidBlockHash)
