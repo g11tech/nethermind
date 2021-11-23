@@ -511,15 +511,12 @@ namespace Nethermind.Blockchain
             {
                 throw new InvalidOperationException("An attempt to suggest a header with a null hash.");
             }
-            
-            while (!CanAcceptNewBlocks)
+
+            if (!CanAcceptNewBlocks)
             {
-                _logger.Trace($"CannotAccept. canAcceptNewBlockCounter: {_canAcceptNewBlocksCounter}");
-                Thread.Sleep(100);
-               // return AddBlockResult.CannotAccept;
+                return AddBlockResult.CannotAccept;
             }
 
-        
             HashSet<Keccak> invalidBlocksWithThisNumber = _invalidBlocks.Get(header.Number);
             if (invalidBlocksWithThisNumber?.Contains(header.Hash) ?? false)
             {
