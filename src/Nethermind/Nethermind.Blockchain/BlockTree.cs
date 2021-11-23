@@ -514,6 +514,7 @@ namespace Nethermind.Blockchain
             
             if (!CanAcceptNewBlocks)
             {
+                _logger.Trace($"CannotAccept. canAcceptNewBlockCounter: {_canAcceptNewBlocksCounter}");
                 return AddBlockResult.CannotAccept;
             }
 

@@ -430,6 +430,9 @@ namespace Nethermind.Blockchain.Processing
         private void PrepareBlocksToProcess(Block suggestedBlock, ProcessingOptions options, ProcessingBranch processingBranch)
         {
             List<Block> blocksToProcess = processingBranch.BlocksToProcess;
+            
+            if (_logger.IsTrace) _logger.Trace($"Preparing {blocksToProcess.Count} blocks to process ({options})");
+
             if ((options & ProcessingOptions.ForceProcessing) != 0)
             {
                 processingBranch.Blocks.Clear();

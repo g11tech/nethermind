@@ -135,6 +135,11 @@ namespace Nethermind.Blockchain.Validators
                 {
                     if(_logger.IsError) _logger.Error($"  bloom {processedBlock.Header.Bloom} != stated bloom {suggestedBlock.Header.Bloom}");
                 }
+                
+                if (processedBlock.Header.TxRoot != suggestedBlock.Header.TxRoot)
+                {
+                    if(_logger.IsError) _logger.Error($"  tx root {processedBlock.Header.TxRoot} != stated tx root {suggestedBlock.Header.TxRoot}");
+                }
 
                 if (processedBlock.Header.ReceiptsRoot != suggestedBlock.Header.ReceiptsRoot)
                 {
