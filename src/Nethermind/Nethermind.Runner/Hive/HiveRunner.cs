@@ -215,11 +215,11 @@ namespace Nethermind.Runner.Hive
 
                 AddBlockResult result = _blockTree.SuggestBlock(block);
 
-                while (result == AddBlockResult.CannotAccept)
-                {
-                    result = _blockTree.SuggestBlock(block);
-                    Thread.Sleep(100);
-                }
+                // while (result == AddBlockResult.CannotAccept)
+                // {
+                //     result = _blockTree.SuggestBlock(block);
+                //     Thread.Sleep(100);
+                // }
                 
                 if (result != AddBlockResult.Added && result != AddBlockResult.AlreadyKnown)
                 {
