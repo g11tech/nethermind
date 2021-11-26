@@ -141,23 +141,36 @@ namespace Nethermind.Network
 
         private void InitProtocol(ISession session, string protocolCode, int version, bool addCapabilities = false)
         {
+            if (protocolCode != "p2p")
+            {
+                _logger.Info($"protocol requested. code: {protocolCode}, ver: {version}");
+            }
             if (session.State < SessionState.Initialized)
             {
+                _logger.Info("throwing error on too low state");
                 throw new InvalidOperationException($"{nameof(InitProtocol)} called on {session}");
             }
 
             if (session.State != SessionState.Initialized)
             {
+                _logger.Info("return on state something");
                 return;
             }
 
             string code = protocolCode.ToLowerInvariant();
             if (!_protocolFactories.TryGetValue(code, out Func<ISession, int, IProtocolHandler> protocolFactory))
             {
+                _logger.Info("throwing error on protocol not supported");
                 throw new NotSupportedException($"Protocol {code} {version} is not supported");
             }
 
             IProtocolHandler protocolHandler = protocolFactory(session, version);
+
+            if (protocolCode.Equals(Protocol.AA))
+            {
+                InitSatelliteProtocol(session, (ProtocolHandlerBase)protocolHandler);
+            }
+            
             protocolHandler.SubprotocolRequested += (s, e) => InitProtocol(session, e.ProtocolCode, e.Version);
             session.AddProtocolHandler(protocolHandler);
             if (addCapabilities)
@@ -229,6 +242,7 @@ namespace Nethermind.Network
 
         private void InitSatelliteProtocol(ISession session, ProtocolHandlerBase handler)
         {
+            _logger.Info("we are in InitSatelliteProtocol");
             session.Node.EthDetails = handler.Name;
             handler.ProtocolInitialized += (sender, args) =>
             {
@@ -249,7 +263,7 @@ namespace Nethermind.Network
                     if (peer != null)
                     {
                         peer.SyncPeer.RegisterSatelliteProtocol(handler.ProtocolCode, handler);
-                        if (_logger.IsDebug) _logger.Debug($"{handler.ProtocolCode} satellite protocol registered for sync peer {session}.");
+                        _logger.Info($"{handler.ProtocolCode} satellite protocol registered for sync peer {session}.");
                     }
                     else
                     {
@@ -261,14 +275,14 @@ namespace Nethermind.Network
                             return dict;
                         });
                         
-                        if (_logger.IsDebug) _logger.Debug($"{handler.ProtocolCode} satellite protocol sync peer {session} not found.");
+                        _logger.Info($"{handler.ProtocolCode} satellite protocol sync peer {session} not found.");
                     }
 
-                    if (_logger.IsTrace) _logger.Trace($"Finalized {handler.ProtocolCode.ToUpper()} protocol initialization on {session} - adding sync peer {session.Node:s}");
+                    _logger.Info($"Finalized {handler.ProtocolCode.ToUpper()} protocol initialization on {session} - adding sync peer {session.Node:s}");
                 }
                 else
                 {
-                    if (_logger.IsTrace) _logger.Trace($"|NetworkTrace| {handler.ProtocolCode}{handler.ProtocolVersion} is invalid on {session}");
+                    _logger.Info($"|NetworkTrace| {handler.ProtocolCode}{handler.ProtocolVersion} is invalid on {session}");
                 }
             };
         }

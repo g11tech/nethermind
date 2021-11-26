@@ -74,6 +74,9 @@ namespace Nethermind.AccountAbstraction.Network
 
         public override void Init()
         {
+            Logger.Warn("initializing aa (Init in handler)");
+            Logger.Warn($"protocol name: {Name}, code: {ProtocolCode}, version: {ProtocolVersion}");
+
             ProtocolInitialized?.Invoke(this, new ProtocolInitializedEventArgs(this));
             
             _userOperationPool.AddPeer(this);
