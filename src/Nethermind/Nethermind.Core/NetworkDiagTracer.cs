@@ -62,7 +62,7 @@ namespace Nethermind.Core
 
             string contents = stringBuilder.ToString();
             File.WriteAllText(NetworkDiagTracerPath, contents);
-            _logger.Info(contents);
+            // _logger.Info(contents);
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]

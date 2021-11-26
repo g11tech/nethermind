@@ -181,6 +181,16 @@ namespace Nethermind.Network.P2P.ProtocolHandlers
             RemoteClientId = hello.ClientId;
             Session.Node.ClientId = hello.ClientId;
 
+            if (Session.Node.ClientType != NodeClientType.Nethermind)
+            {
+                return;
+            }
+            
+            Logger.Info("nethfound");
+            
+            if(NetworkDiagTracer.IsEnabled)
+                NetworkDiagTracer.ReportConnect(Session.Node.Address, $"nethfound");
+            
             if(Logger.IsTrace) Logger.Trace(!_sentHello
                 ? $"{Session.RemoteNodeId} P2P initiating inbound {hello.Protocol}.{hello.P2PVersion} " +
                   $"on {hello.ListenPort} ({hello.ClientId})"
