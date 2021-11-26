@@ -246,6 +246,10 @@ namespace Nethermind.Network
             session.Node.EthDetails = handler.Name;
             handler.ProtocolInitialized += (sender, args) =>
             {
+                if (handler.ProtocolCode.Equals(Protocol.AA))
+                {
+                    _logger.Info("aa protocol initialized, doing my job in InitSatelliteProtocol");
+                }
                 if (!RunBasicChecks(session, handler.ProtocolCode, handler.ProtocolVersion)) return;
                 // SyncPeerProtocolInitializedEventArgs typedArgs = (SyncPeerProtocolInitializedEventArgs)args;
                 // _stats.ReportSyncPeerInitializeEvent(handler.ProtocolCode, session.Node, new SyncPeerNodeDetails

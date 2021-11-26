@@ -292,8 +292,7 @@ namespace Nethermind.Network.P2P.ProtocolHandlers
 
         public override void DisconnectProtocol(DisconnectReason disconnectReason, string details)
         {
-            if (Logger.IsTrace)
-                Logger.Trace($"Sending disconnect {disconnectReason} ({details}) to {Session.Node:s}");
+            Logger.Info($"Sending disconnect {disconnectReason} ({details}) to {Session.Node:s}");
             DisconnectMessage message = new DisconnectMessage(disconnectReason);
             Send(message);
             if(NetworkDiagTracer.IsEnabled)

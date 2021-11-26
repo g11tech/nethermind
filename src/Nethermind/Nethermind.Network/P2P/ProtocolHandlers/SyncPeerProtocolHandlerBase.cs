@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DotNetty.Common.Utilities;
@@ -481,6 +482,7 @@ namespace Nethermind.Network.P2P.ProtocolHandlers
         public void RegisterSatelliteProtocol<T>(string protocol, T protocolHandler) where T : class
         {
             ProtocolHandlers[protocol] = protocolHandler;
+            Logger.Warn($"satellite protocol registered. Protocols: {ProtocolHandlers.Keys.Count}");
         }
 
         public bool TryGetSatelliteProtocol<T>(string protocol, out T? protocolHandler) where T : class
@@ -490,6 +492,8 @@ namespace Nethermind.Network.P2P.ProtocolHandlers
                 protocolHandler = handler as T;
                 return protocolHandler != null;
             }
+            
+            Logger.Warn("we are in TryGetSatelliteProtocol");
 
             protocolHandler = null;
             return false;

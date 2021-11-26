@@ -80,11 +80,13 @@ namespace Nethermind.AccountAbstraction.Network
             ProtocolInitialized?.Invoke(this, new ProtocolInitializedEventArgs(this));
             
             _userOperationPool.AddPeer(this);
+            SendNewUserOperation(new UserOperation(new UserOperationRpc()));
             _session.Disconnected += SessionDisconnected;
         }
 
         private void SessionDisconnected(object? sender, DisconnectEventArgs e)
         {
+            Logger.Warn("aa session disconnected");
             _userOperationPool.RemovePeer(Id);
             _session.Disconnected -= SessionDisconnected;
         }
@@ -107,6 +109,7 @@ namespace Nethermind.AccountAbstraction.Network
             switch (message.PacketType)
             {
                 case AaMessageCode.UserOperations:
+                    Logger.Warn("received User Op, yeeeaaaah!!");
                     Metrics.UserOperationsMessagesReceived++;
                     UserOperationsMessage uopMsg = Deserialize<UserOperationsMessage>(message.Content);
                     ReportIn(uopMsg);
