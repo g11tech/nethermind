@@ -17,10 +17,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using DotNetty.Common.Utilities;
 using Nethermind.AccountAbstraction.Broadcaster;
 using Nethermind.AccountAbstraction.Data;
 using Nethermind.AccountAbstraction.Source;
+using Nethermind.Blockchain;
+using Nethermind.Core;
 using Nethermind.Core.Collections;
 using Nethermind.Core.Crypto;
 using Nethermind.JsonRpc;
@@ -32,11 +35,12 @@ using Nethermind.Network.P2P.ProtocolHandlers;
 using Nethermind.Network.Rlpx;
 using Nethermind.Stats;
 using Nethermind.Stats.Model;
+using Nethermind.Synchronization;
 using Timeouts = Nethermind.Network.Timeouts;
 
 namespace Nethermind.AccountAbstraction.Network
 {
-    public class AaProtocolHandler : ProtocolHandlerBase, IZeroProtocolHandler, IUserOperationPoolPeer
+    public class AaProtocolHandler : SyncPeerProtocolHandlerBase, IZeroProtocolHandler, IUserOperationPoolPeer
     {
         private readonly ISession _session;
         private readonly IUserOperationPool _userOperationPool;
@@ -45,14 +49,14 @@ namespace Nethermind.AccountAbstraction.Network
             IMessageSerializationService serializer,
             INodeStatsManager nodeStatsManager,
             IUserOperationPool userOperationPool,
+            ISyncServer syncServer,
             ILogManager logManager)
-            : base(session, nodeStatsManager, serializer, logManager)
+            : base(session, serializer, nodeStatsManager, syncServer, logManager)
         {
             _session = session ?? throw new ArgumentNullException(nameof(session));
             _userOperationPool = userOperationPool ?? throw new ArgumentNullException(nameof(userOperationPool));
         }
         
-        public PublicKey Id => _session.Node.Id;
         
         public override byte ProtocolVersion => 0;
         
@@ -79,15 +83,19 @@ namespace Nethermind.AccountAbstraction.Network
 
             ProtocolInitialized?.Invoke(this, new ProtocolInitializedEventArgs(this));
             
-            _userOperationPool.AddPeer(this);
+            // _userOperationPool.AddPeer(this);
             _session.Disconnected += SessionDisconnected;
         }
 
         private void SessionDisconnected(object? sender, DisconnectEventArgs e)
         {
             Logger.Warn("aa session disconnected");
-            _userOperationPool.RemovePeer(Id);
+            // _userOperationPool.RemovePeer(Id);
             _session.Disconnected -= SessionDisconnected;
+        }
+
+        public override void NotifyOfNewBlock(Block block, SendBlockPriority priority)
+        {
         }
 
         public override void HandleMessage(Packet message)
@@ -103,7 +111,7 @@ namespace Nethermind.AccountAbstraction.Network
             }
         }
         
-        public void HandleMessage(ZeroPacket message)
+        public override void HandleMessage(ZeroPacket message)
         {
             switch (message.PacketType)
             {
@@ -165,6 +173,10 @@ namespace Nethermind.AccountAbstraction.Network
             UserOperationsMessage msg = new(uopsToSend);
             Send(msg);
             Metrics.UserOperationsMessagesSent++;
+        }
+
+        protected override void OnDisposed()
+        {
         }
 
         public override void DisconnectProtocol(DisconnectReason disconnectReason, string details)

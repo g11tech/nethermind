@@ -22,6 +22,7 @@ using Nethermind.Network;
 using Nethermind.Network.P2P;
 using Nethermind.Stats;
 using Nethermind.Stats.Model;
+using Nethermind.Synchronization;
 using Newtonsoft.Json.Linq;
 
 namespace Nethermind.AccountAbstraction
@@ -148,16 +149,29 @@ namespace Nethermind.AccountAbstraction
 
         public Task InitNetworkProtocol()
         {
-            if (_nethermindApi is null) throw new ArgumentNullException(nameof(_nethermindApi));
-            if (UserOperationPool is null) throw new ArgumentNullException(nameof(UserOperationPool));
+            if (_accountAbstractionConfig.Enabled)
+            {
+                if (_nethermindApi is null) throw new ArgumentNullException(nameof(_nethermindApi));
+                if (UserOperationPool is null) throw new ArgumentNullException(nameof(UserOperationPool));
 
-            IProtocolsManager protocolsManager = _nethermindApi.ProtocolsManager ?? throw new ArgumentNullException(nameof(_nethermindApi.ProtocolsManager));
-            IMessageSerializationService serializer = _nethermindApi.MessageSerializationService ?? throw new ArgumentNullException(nameof(_nethermindApi.MessageSerializationService));
-            INodeStatsManager stats = _nethermindApi.NodeStatsManager ?? throw new ArgumentNullException(nameof(_nethermindApi.NodeStatsManager));
-            ILogManager logManager = _nethermindApi.LogManager ?? throw new ArgumentNullException(nameof(_nethermindApi.LogManager));
+                IProtocolsManager protocolsManager = _nethermindApi.ProtocolsManager ??
+                                                     throw new ArgumentNullException(
+                                                         nameof(_nethermindApi.ProtocolsManager));
+                IMessageSerializationService serializer = _nethermindApi.MessageSerializationService ??
+                                                          throw new ArgumentNullException(
+                                                              nameof(_nethermindApi.MessageSerializationService));
+                INodeStatsManager stats = _nethermindApi.NodeStatsManager ??
+                                          throw new ArgumentNullException(nameof(_nethermindApi.NodeStatsManager));
+                ILogManager logManager = _nethermindApi.LogManager ??
+                                         throw new ArgumentNullException(nameof(_nethermindApi.LogManager));
+                ISyncServer syncServer = _nethermindApi.SyncServer ??
+                                         throw new ArgumentNullException(nameof(_nethermindApi.SyncServer));
 
-            protocolsManager.AddProtocol(Protocol.AA, session => new AaProtocolHandler(session, serializer, stats, UserOperationPool, logManager));
-            protocolsManager.AddSupportedCapability(new Capability(Protocol.AA, 0));
+                protocolsManager.AddProtocol(Protocol.AA,
+                    session => new AaProtocolHandler(session, serializer, stats, UserOperationPool, syncServer, logManager));
+                protocolsManager.AddSupportedCapability(new Capability(Protocol.AA, 0));
+            }
+
             return Task.CompletedTask;
         }
 
