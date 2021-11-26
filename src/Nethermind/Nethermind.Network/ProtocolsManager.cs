@@ -168,7 +168,7 @@ namespace Nethermind.Network
 
             if (protocolCode.Equals(Protocol.AA))
             {
-                InitSyncPeerProtocol(session, (SyncPeerProtocolHandlerBase)protocolHandler);
+                InitSatelliteProtocol(session, (ProtocolHandlerBase)protocolHandler);
             }
             
             protocolHandler.SubprotocolRequested += (s, e) => InitProtocol(session, e.ProtocolCode, e.Version);
@@ -192,10 +192,6 @@ namespace Nethermind.Network
             }
 
             _protocolFactories[code] = (session, _) => factory(session);
-            if (code.Equals(Protocol.AA))
-            {
-                _logger.Warn("AA protocol added to protocolFactories");
-            }
         }
 
         private IDictionary<string, Func<ISession, int, IProtocolHandler>> GetProtocolFactories()

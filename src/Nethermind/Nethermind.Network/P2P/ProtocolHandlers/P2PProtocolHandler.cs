@@ -217,7 +217,6 @@ namespace Nethermind.Network.P2P.ProtocolHandlers
                     if (Logger.IsTrace)
                         Logger.Trace($"{Session.RemoteNodeId} Agreed on {theirCapability.ProtocolCode} v{theirCapability.Version}");
                     _agreedCapabilities.Add(theirCapability);
-                    Logger.Warn($"agreed cap added: {theirCapability}");
                 }
                 else
                 {
@@ -233,8 +232,6 @@ namespace Nethermind.Network.P2P.ProtocolHandlers
                     DisconnectReason.UselessPeer,
                     $"capabilities: {string.Join(", ", capabilities)}");
             }
-            
-            Logger.Warn($"agreed caps: {_agreedCapabilities.Count}");
 
             ReceivedProtocolInitMsg(hello);
 
