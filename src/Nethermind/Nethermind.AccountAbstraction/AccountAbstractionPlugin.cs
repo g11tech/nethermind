@@ -157,7 +157,7 @@ namespace Nethermind.AccountAbstraction
             ILogManager logManager = _nethermindApi.LogManager ?? throw new ArgumentNullException(nameof(_nethermindApi.LogManager));
 
             protocolsManager.AddProtocol(Protocol.AA, session => new AaProtocolHandler(session, serializer, stats, UserOperationPool, logManager));
-            // protocolsManager.AddSupportedCapability(new Capability(Protocol.AA, 0));
+            protocolsManager.AddSupportedCapability(new Capability(Protocol.AA, 0));
             return Task.CompletedTask;
         }
 

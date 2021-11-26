@@ -80,7 +80,6 @@ namespace Nethermind.AccountAbstraction.Network
             ProtocolInitialized?.Invoke(this, new ProtocolInitializedEventArgs(this));
             
             _userOperationPool.AddPeer(this);
-            SendNewUserOperation(new UserOperation(new UserOperationRpc()));
             _session.Disconnected += SessionDisconnected;
         }
 
