@@ -28,6 +28,7 @@
     <PackageReference Include="YamlDotNet" Version="11.2.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Nethermind.AccountAbstraction\Nethermind.AccountAbstraction.csproj" />
     <ProjectReference Include="..\Nethermind.Api\Nethermind.Api.csproj" />
     <ProjectReference Include="..\Nethermind.Consensus.AuRa\Nethermind.Consensus.AuRa.csproj" />
     <ProjectReference Include="..\Nethermind.Consensus.Clique\Nethermind.Consensus.Clique.csproj" />
@@ -73,6 +74,9 @@
     </Content>
     <Content Remove="out\**" />
     <Content Remove="keystore\**" />
+    <Content Include="DSL\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="git-hash">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -103,12 +107,15 @@
     <None Remove="keystore\**" />
   </ItemGroup>
   <ItemGroup>
-    <PluginsForBuild Include="$(OutputPath)\Nethermind.Merge.Plugin.*;&#xD;&#xA;                              $(OutputPath)\Nethermind.Mev.*;&#xD;&#xA;                              $(OutputPath)\Nethermind.HealthChecks.*;&#xD;&#xA;                              $(OutputPath)\Nethermind.Consensus.*.*" />
+    <PluginsForBuild Include="$(OutputPath)\Nethermind.Merge.Plugin.*;&#xA;                              $(OutputPath)\Nethermind.Mev.*;&#xA;                              $(OutputPath)\Nethermind.AccountAbstraction.*;&#xA;                              $(OutputPath)\Nethermind.HealthChecks.*;&#xA;                              $(OutputPath)\Nethermind.Consensus.*.*" />
     
-    <PluginsForPublish Include="$(OutputPath)\Nethermind.Merge.Plugin.dll;&#xD;&#xA;                                $(OutputPath)\Nethermind.Mev.dll;&#xD;&#xA;                                $(OutputPath)\Nethermind.HealthChecks.dll;&#xD;&#xA;                                $(OutputPath)\Nethermind.Consensus.*.dll" />
+    <PluginsForPublish Include="$(OutputPath)\Nethermind.Merge.Plugin.dll;&#xA;                                $(OutputPath)\Nethermind.Mev.dll;&#xA;                                $(OutputPath)\Nethermind.AccountAbstraction.*;&#xA;                                $(OutputPath)\Nethermind.HealthChecks.dll;&#xA;                                $(OutputPath)\Nethermind.Consensus.*.dll" />
   </ItemGroup>
   <ItemGroup>
     <GitHash Include="git-hash" />
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Contracts\EntryPoint.json" />
   </ItemGroup>
 
   <Target Name="StoreGitHashBeforeBuild" BeforeTargets="BeforeBuild">
@@ -126,6 +133,8 @@
   <Target Name="CopyPluginsAfterBuild" AfterTargets="AfterBuild">
     <Message Text="---&gt; Copying Plugins After Build" Importance="High" />
     <Copy SourceFiles="@(PluginsForBuild)" DestinationFolder="$(OutDir)\plugins" />
+    <Copy SourceFiles="$(SolutionDir)Nethermind.Dsl\bin\$(Configuration)\$(TargetFramework)\Nethermind.Dsl.dll" DestinationFolder="$(OutDir)plugins" Condition="Exists('$(SolutionDir)Nethermind.Dsl\bin\$(Configuration)\$(TargetFramework)\Nethermind.Dsl.dll')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(SolutionDir)Nethermind.Dsl\bin\$(Configuration)\$(TargetFramework)\Nethermind.Dsl.pdb" DestinationFolder="$(OutDir)plugins" Condition="Exists('$(SolutionDir)Nethermind.Dsl\bin\$(Configuration)\$(TargetFramework)\Nethermind.Dsl.pdb')" SkipUnchangedFiles="true" />
   </Target>
 
     <Target Name="CopyPluginsAfterPublish" AfterTargets="AfterPublish">
