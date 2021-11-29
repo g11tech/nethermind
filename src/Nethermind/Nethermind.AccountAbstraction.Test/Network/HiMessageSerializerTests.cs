@@ -15,30 +15,30 @@
 //  along with the Nethermind. If not, see <http://www.gnu.org/licenses/>.
 // 
 
-using Nethermind.Network;
-using Nethermind.Serialization.Rlp;
+using FluentAssertions;
+using Nethermind.AccountAbstraction.Network;
+using Nethermind.Core.Extensions;
+using NUnit.Framework;
 
-namespace Nethermind.AccountAbstraction.Network
+namespace Nethermind.AccountAbstraction.Test.Network
 {
-    public class HiMessageSerializer : IMessageSerializer<HiMessage>
+    [TestFixture]
+    public class HiMessageSerializerTests
     {
-        public byte[] Serialize(HiMessage message)
+        [Test]
+        public void Can_do_roundtrip()
         {
-            return Rlp.Encode(
-                Rlp.Encode(message.ProtocolVersion)
-            ).Bytes;
-        }
+            HiMessage hiMessage = new() { ProtocolVersion = 111 };
 
-        public HiMessage Deserialize(byte[] bytes)
-        {
-            RlpStream rlpStream = bytes.AsRlpStream();
-            rlpStream.ReadSequenceLength();
+            HiMessageSerializer serializer = new();
+            byte[] serialized = serializer.Serialize(hiMessage);
+            byte[] expectedBytes = Bytes.FromHexString("c16f");
 
-            HiMessage helloMessage = new HiMessage();
-            helloMessage.ProtocolVersion = rlpStream.DecodeByte();
+            serialized.Should().BeEquivalentTo(expectedBytes);
             
+            HiMessage deserialized = serializer.Deserialize(serialized);
 
-            return helloMessage;
+            hiMessage.ProtocolVersion.Should().Be(deserialized.ProtocolVersion);
         }
     }
 }
