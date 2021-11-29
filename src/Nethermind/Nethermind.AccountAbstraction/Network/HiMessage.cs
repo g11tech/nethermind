@@ -15,18 +15,19 @@
 //  along with the Nethermind. If not, see <http://www.gnu.org/licenses/>.
 // 
 
+using Nethermind.Network.P2P.Messages;
+
 namespace Nethermind.AccountAbstraction.Network
 {
-    public static class AaMessageCode
+    public class HiMessage : P2PMessage
     {
-        public const int Hi = 0xa9;
-        public const int UserOperations = 0xaa;
-        
-        // more UserOperations-connected messages are planned to be added in the future
-        // probably as a higher version of AaProtocolHandler. Commented out for now
-        
-        // public const int NewPooledUserOperationsHashes  = 0xab;
-        // public const int GetPooledUserOperations = 0xac;
-        // public const int PooledUserOperations  = 0xad;
+        public byte ProtocolVersion { get; set; }
+        public override int PacketType => AaMessageCode.Hi;
+        public override string Protocol => "aa";
+
+        public override string ToString()
+        {
+            return $"{Protocol}.{ProtocolVersion} Hi!";
+        }
     }
 }

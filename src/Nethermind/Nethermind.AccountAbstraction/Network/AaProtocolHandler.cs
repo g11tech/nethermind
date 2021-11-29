@@ -84,16 +84,12 @@ namespace Nethermind.AccountAbstraction.Network
             _userOperationPool.AddPeer(this);
             _session.Disconnected += SessionDisconnected;
             
-            HelloMessage helloMessage = new HelloMessage
+            HiMessage hiMessage = new HiMessage
             {
-                Capabilities = new List<Capability>(),
-                ClientId = ClientVersion.Description,
-                NodeId = Id,
-                ListenPort = 0,
-                P2PVersion = ProtocolVersion
+                ProtocolVersion = ProtocolVersion
             };
 
-            Send(helloMessage);
+            Send(hiMessage);
             
             CheckProtocolInitTimeout().ContinueWith(x =>
             {
@@ -113,10 +109,10 @@ namespace Nethermind.AccountAbstraction.Network
 
         public override void HandleMessage(Packet message)
         {
-            if (message.PacketType == P2PMessageCode.Hello)
+            if (message.PacketType == AaMessageCode.Hi)
             {
-                Logger.Warn("received hello via AA protocol");
-                ReceivedProtocolInitMsg(Deserialize<HelloMessage>(message.Data));
+                Logger.Warn("received hi via AA protocol");
+                ReceivedProtocolInitMsg(Deserialize<HiMessage>(message.Data));
                 return;
             }
             

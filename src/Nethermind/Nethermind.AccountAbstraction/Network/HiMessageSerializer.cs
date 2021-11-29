@@ -15,18 +15,29 @@
 //  along with the Nethermind. If not, see <http://www.gnu.org/licenses/>.
 // 
 
+using Nethermind.Serialization.Rlp;
+
 namespace Nethermind.AccountAbstraction.Network
 {
-    public static class AaMessageCode
+    public class HiMessageSerializer
     {
-        public const int Hi = 0xa9;
-        public const int UserOperations = 0xaa;
-        
-        // more UserOperations-connected messages are planned to be added in the future
-        // probably as a higher version of AaProtocolHandler. Commented out for now
-        
-        // public const int NewPooledUserOperationsHashes  = 0xab;
-        // public const int GetPooledUserOperations = 0xac;
-        // public const int PooledUserOperations  = 0xad;
+        public byte[] Serialize(HiMessage message)
+        {
+            return Rlp.Encode(
+                Rlp.Encode(message.ProtocolVersion)
+            ).Bytes;
+        }
+
+        public HiMessage Deserialize(byte[] bytes)
+        {
+            RlpStream rlpStream = bytes.AsRlpStream();
+            rlpStream.ReadSequenceLength();
+
+            HiMessage helloMessage = new HiMessage();
+            helloMessage.ProtocolVersion = rlpStream.DecodeByte();
+            
+
+            return helloMessage;
+        }
     }
 }
