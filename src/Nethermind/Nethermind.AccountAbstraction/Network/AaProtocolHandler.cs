@@ -21,8 +21,10 @@ using DotNetty.Common.Utilities;
 using Nethermind.AccountAbstraction.Broadcaster;
 using Nethermind.AccountAbstraction.Data;
 using Nethermind.AccountAbstraction.Source;
+using Nethermind.Core;
 using Nethermind.Core.Collections;
 using Nethermind.Core.Crypto;
+using Nethermind.Core.Extensions;
 using Nethermind.JsonRpc;
 using Nethermind.Logging;
 using Nethermind.Network;
@@ -81,6 +83,27 @@ namespace Nethermind.AccountAbstraction.Network
             
             _userOperationPool.AddPeer(this);
             _session.Disconnected += SessionDisconnected;
+            
+            UserOperationRpc rpcOp = new UserOperationRpc()
+            {
+                Sender = Address.Zero,
+                Nonce = 0,
+                Paymaster = Address.Zero,
+                CallData = Bytes.Empty,
+                InitCode = Bytes.Empty,
+                MaxFeePerGas = 1,
+                MaxPriorityFeePerGas = 1,
+                CallGas = 1_000_000,
+                VerificationGas = 1_000_000,
+                PreVerificationGas = 210000,
+                PaymasterData = Bytes.Empty,
+                Signature = Bytes.Empty,
+            };
+
+
+            UserOperation userOperation = new UserOperation(rpcOp);
+            SendNewUserOperation(userOperation);
+            CheckProtocolInitTimeout();
         }
 
         private void SessionDisconnected(object? sender, DisconnectEventArgs e)
@@ -119,6 +142,7 @@ namespace Nethermind.AccountAbstraction.Network
 
         private void Handle(UserOperationsMessage uopMsg)
         {
+            ReceivedProtocolInitMsg(uopMsg);
             IList<UserOperation> userOperations = uopMsg.UserOperations;
             for (int i = 0; i < userOperations.Count; i++)
             {
