@@ -69,6 +69,7 @@ namespace Nethermind.Network.P2P.Subprotocols.Wit
         {
             ProtocolInitialized?.Invoke(this, new ProtocolInitializedEventArgs(this));
             // GetBlockWitnessHashes(Keccak.Zero, CancellationToken.None);
+            Logger.Warn("-----WIT----- protocol initialized");
         }
 
         public override void HandleMessage(Packet message)
@@ -164,6 +165,7 @@ namespace Nethermind.Network.P2P.Subprotocols.Wit
         public override void DisconnectProtocol(DisconnectReason disconnectReason, string details)
         {
             Dispose();
+            Logger.Warn("-----WIT----- protocol disconnected");
         }
 
         public override void Dispose()

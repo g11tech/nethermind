@@ -78,12 +78,14 @@ namespace Nethermind.AccountAbstraction.Network
             
             _userOperationPool.AddPeer(this);
             _session.Disconnected += SessionDisconnected;
+            Logger.Warn("AA protocol initialized");
         }
 
         private void SessionDisconnected(object? sender, DisconnectEventArgs e)
         {
             _userOperationPool.RemovePeer(Id);
             _session.Disconnected -= SessionDisconnected;
+            Logger.Warn("AA protocol disconnected");
         }
 
         public override void HandleMessage(Packet message)
