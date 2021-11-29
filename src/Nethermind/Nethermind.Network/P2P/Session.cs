@@ -184,6 +184,8 @@ namespace Nethermind.Network.P2P
 
             int dynamicMessageCode = zeroPacket.PacketType;
             (string? protocol, int messageId) = _resolver.ResolveProtocol(zeroPacket.PacketType);
+            _logger.Warn($"received message via {protocol} protocol, message: {messageId}");
+
             zeroPacket.Protocol = protocol;
 
             if (_logger.IsTrace)

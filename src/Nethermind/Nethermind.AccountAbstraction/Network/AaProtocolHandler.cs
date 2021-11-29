@@ -83,21 +83,6 @@ namespace Nethermind.AccountAbstraction.Network
             
             _userOperationPool.AddPeer(this);
             _session.Disconnected += SessionDisconnected;
-            
-            // HiMessage hiMessage = new HiMessage
-            // {
-            //     ProtocolVersion = ProtocolVersion
-            // };
-            //
-            // Send(hiMessage);
-            //
-            // CheckProtocolInitTimeout().ContinueWith(x =>
-            // {
-            //     if (x.IsFaulted && Logger.IsError)
-            //     {
-            //         Logger.Error("Error during aaProtocol handler timeout logic", x.Exception);
-            //     }
-            // });
         }
 
         private void SessionDisconnected(object? sender, DisconnectEventArgs e)
@@ -109,13 +94,9 @@ namespace Nethermind.AccountAbstraction.Network
 
         public override void HandleMessage(Packet message)
         {
-            if (message.PacketType == AaMessageCode.Hi)
-            {
-                Logger.Warn("received hi via AA protocol");
-                ReceivedProtocolInitMsg(Deserialize<HiMessage>(message.Data));
-                return;
-            }
-            
+            Logger.Warn("received message via AA protocol");
+            Logger.Info($"message: {message}");
+
             ZeroPacket zeroPacket = new(message);
             try
             {

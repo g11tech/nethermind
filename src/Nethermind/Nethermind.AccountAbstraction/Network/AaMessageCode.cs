@@ -19,8 +19,7 @@ namespace Nethermind.AccountAbstraction.Network
 {
     public static class AaMessageCode
     {
-        public const int Hi = 0xa9;
-        public const int UserOperations = 0xaa;
+        public const int UserOperations = 0x0f;
         
         // more UserOperations-connected messages are planned to be added in the future
         // probably as a higher version of AaProtocolHandler. Commented out for now
