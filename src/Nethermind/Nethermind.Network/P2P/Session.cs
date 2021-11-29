@@ -185,16 +185,12 @@ namespace Nethermind.Network.P2P
             int dynamicMessageCode = zeroPacket.PacketType;
             (string? protocol, int messageId) = _resolver.ResolveProtocol(zeroPacket.PacketType);
             
-            if (!protocol.Equals("p2p") && !protocol.Equals("eth"))
+            if (!protocol.Equals("p2p") && !protocol.Equals("eth") && !protocol.Equals("wit"))
             {
                 _logger.Error($"received msg via {protocol} protocol, id: {messageId}");
-                return;
+                protocol = "eth";
             }
-            else if (!protocol.Equals("p2p"))
-            {
-                _logger.Warn($"received msg via {protocol} protocol, id: {messageId}");
-            }
-            
+
             zeroPacket.Protocol = protocol;
 
             if (_logger.IsTrace)
