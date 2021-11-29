@@ -84,20 +84,20 @@ namespace Nethermind.AccountAbstraction.Network
             _userOperationPool.AddPeer(this);
             _session.Disconnected += SessionDisconnected;
             
-            HiMessage hiMessage = new HiMessage
-            {
-                ProtocolVersion = ProtocolVersion
-            };
-
-            Send(hiMessage);
-            
-            CheckProtocolInitTimeout().ContinueWith(x =>
-            {
-                if (x.IsFaulted && Logger.IsError)
-                {
-                    Logger.Error("Error during aaProtocol handler timeout logic", x.Exception);
-                }
-            });
+            // HiMessage hiMessage = new HiMessage
+            // {
+            //     ProtocolVersion = ProtocolVersion
+            // };
+            //
+            // Send(hiMessage);
+            //
+            // CheckProtocolInitTimeout().ContinueWith(x =>
+            // {
+            //     if (x.IsFaulted && Logger.IsError)
+            //     {
+            //         Logger.Error("Error during aaProtocol handler timeout logic", x.Exception);
+            //     }
+            // });
         }
 
         private void SessionDisconnected(object? sender, DisconnectEventArgs e)
