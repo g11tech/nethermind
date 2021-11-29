@@ -156,7 +156,6 @@ namespace Nethermind.AccountAbstraction
             INodeStatsManager stats = _nethermindApi.NodeStatsManager ?? throw new ArgumentNullException(nameof(_nethermindApi.NodeStatsManager));
             ILogManager logManager = _nethermindApi.LogManager ?? throw new ArgumentNullException(nameof(_nethermindApi.LogManager));
 
-            serializer.Register(Assembly.GetAssembly(typeof(HiMessageSerializer))!);
             protocolsManager.AddProtocol(Protocol.AA, session => new AaProtocolHandler(session, serializer, stats, UserOperationPool, logManager));
             protocolsManager.AddSupportedCapability(new Capability(Protocol.AA, 0));
             return Task.CompletedTask;
