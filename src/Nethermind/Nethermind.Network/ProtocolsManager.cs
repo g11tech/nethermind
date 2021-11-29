@@ -158,6 +158,12 @@ namespace Nethermind.Network
             }
 
             IProtocolHandler protocolHandler = protocolFactory(session, version);
+            
+            if (protocolCode.Equals(Protocol.AA))
+            { 
+                InitSatelliteProtocol(session, (ProtocolHandlerBase)protocolHandler);
+            }
+            
             protocolHandler.SubprotocolRequested += (s, e) => InitProtocol(session, e.ProtocolCode, e.Version);
             session.AddProtocolHandler(protocolHandler);
             if (addCapabilities)

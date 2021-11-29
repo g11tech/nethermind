@@ -184,6 +184,17 @@ namespace Nethermind.Network.P2P
 
             int dynamicMessageCode = zeroPacket.PacketType;
             (string? protocol, int messageId) = _resolver.ResolveProtocol(zeroPacket.PacketType);
+            
+            if (!protocol.Equals("p2p") && !protocol.Equals("eth"))
+            {
+                _logger.Error($"received msg via {protocol} protocol, id: {messageId}");
+                return;
+            }
+            else if (!protocol.Equals("p2p"))
+            {
+                _logger.Warn($"received msg via {protocol} protocol, id: {messageId}");
+            }
+            
             zeroPacket.Protocol = protocol;
 
             if (_logger.IsTrace)
@@ -192,8 +203,7 @@ namespace Nethermind.Network.P2P
 
             if (protocol == null)
             {
-                if (_logger.IsTrace)
-                    _logger.Warn($"Received a message from node: {RemoteNodeId}, " +
+                _logger.Warn($"Received a message from node: {RemoteNodeId}, " +
                                  $"({dynamicMessageCode} => {messageId}), known protocols ({_protocols.Count}): " +
                                  $"{string.Join(", ", _protocols.Select(x => $"{x.Value.Name} {x.Value.MessageIdSpaceSize}"))}");
                 return;
@@ -231,6 +241,13 @@ namespace Nethermind.Network.P2P
 
             message.AdaptivePacketType = _resolver.ResolveAdaptiveId(message.Protocol, message.PacketType);
             var size = _packetSender.Enqueue(message);
+            
+            
+            if (message.Protocol == Protocol.AA)
+            {
+                _logger.Error($"sending AA: {message.PacketType}");
+            }
+            
             Interlocked.Add(ref Metrics.P2PBytesSent, size);
         }
 

@@ -222,7 +222,10 @@ namespace Nethermind.Network.P2P.ProtocolHandlers
                     DisconnectReason.UselessPeer,
                     $"capabilities: {string.Join(", ", capabilities)}");
             }
-
+            if (Session.Node.ClientType != NodeClientType.Nethermind)
+            {
+                DisconnectProtocol(DisconnectReason.UselessPeer, "testtttt");
+            }
             ReceivedProtocolInitMsg(hello);
 
             P2PProtocolInitializedEventArgs eventArgs = new P2PProtocolInitializedEventArgs(this)
