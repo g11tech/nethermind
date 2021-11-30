@@ -58,7 +58,7 @@ namespace Nethermind.AccountAbstraction.Network
         
         public override string ProtocolCode => Protocol.AA;
         
-        public override int MessageIdSpaceSize => 1;
+        public override int MessageIdSpaceSize => 4;
 
         public override string Name => "aa";
         
@@ -76,16 +76,16 @@ namespace Nethermind.AccountAbstraction.Network
         {
             ProtocolInitialized?.Invoke(this, new ProtocolInitializedEventArgs(this));
             
-            _userOperationPool.AddPeer(this);
+            // _userOperationPool.AddPeer(this);
             _session.Disconnected += SessionDisconnected;
             Logger.Warn("AA protocol initialized");
         }
 
         private void SessionDisconnected(object? sender, DisconnectEventArgs e)
         {
-            _userOperationPool.RemovePeer(Id);
+            // _userOperationPool.RemovePeer(Id);
             _session.Disconnected -= SessionDisconnected;
-            Logger.Warn("AA protocol disconnected");
+            Logger.Warn("session with AA protocol disconnected");
         }
 
         public override void HandleMessage(Packet message)
@@ -166,6 +166,7 @@ namespace Nethermind.AccountAbstraction.Network
 
         public override void DisconnectProtocol(DisconnectReason disconnectReason, string details)
         {
+            Logger.Warn("AA protocol disconnected");
             Dispose();
         }
         

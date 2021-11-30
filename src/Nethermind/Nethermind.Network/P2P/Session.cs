@@ -279,8 +279,7 @@ namespace Nethermind.Network.P2P
 
             if (protocol == null)
             {
-                if (_logger.IsTrace)
-                    _logger.Warn($"Received a message from node: {RemoteNodeId}, ({dynamicMessageCode} => {messageId}), " +
+                _logger.Warn($"Received a message from node: {RemoteNodeId}, ({dynamicMessageCode} => {messageId}), " +
                                  $"known protocols ({_protocols.Count}): " +
                                  $"{string.Join(", ", _protocols.Select(x => $"{x.Value.Name} {x.Value.MessageIdSpaceSize}"))}");
                 return;
@@ -601,7 +600,7 @@ namespace Nethermind.Network.P2P
                 _alphabetically[0] = (Protocol.P2P, protocols[Protocol.P2P].MessageIdSpaceSize);
                 int i = 1;
                 foreach (KeyValuePair<string, IProtocolHandler> protocolSession
-                    in protocols.Where(kv => kv.Key != Protocol.P2P).OrderBy(kv => kv.Key))
+                    in protocols.Where(kv => kv.Key != Protocol.P2P && kv.Key != Protocol.AA).OrderBy(kv => kv.Key))
                 {
                     _alphabetically[i++] = (protocolSession.Key, protocolSession.Value.MessageIdSpaceSize);
                 }
