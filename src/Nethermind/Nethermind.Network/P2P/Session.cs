@@ -600,7 +600,7 @@ namespace Nethermind.Network.P2P
                 _alphabetically[0] = (Protocol.P2P, protocols[Protocol.P2P].MessageIdSpaceSize);
                 int i = 1;
                 foreach (KeyValuePair<string, IProtocolHandler> protocolSession
-                    in protocols.Where(kv => kv.Key != Protocol.P2P && kv.Key != Protocol.AA).OrderBy(kv => kv.Key))
+                    in protocols.Where(kv => kv.Key != Protocol.P2P))
                 {
                     _alphabetically[i++] = (protocolSession.Key, protocolSession.Value.MessageIdSpaceSize);
                 }
