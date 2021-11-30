@@ -592,31 +592,46 @@ namespace Nethermind.Network.P2P
 
         private class AdaptiveCodeResolver
         {
-            private readonly (string ProtocolCode, int SpaceSize)[] _alphabetically;
+            private readonly (string ProtocolCode, int SpaceSize)[] _inOrderOfAdding;
 
             public AdaptiveCodeResolver(IDictionary<string, IProtocolHandler> protocols)
             {
-                _alphabetically = new (string, int)[protocols.Count];
-                _alphabetically[0] = (Protocol.P2P, protocols[Protocol.P2P].MessageIdSpaceSize);
+                _inOrderOfAdding = new (string, int)[protocols.Count];
+                _inOrderOfAdding[0] = (Protocol.P2P, protocols[Protocol.P2P].MessageIdSpaceSize);
                 int i = 1;
-                foreach (KeyValuePair<string, IProtocolHandler> protocolSession
-                    in protocols.Where(kv => kv.Key != Protocol.P2P))
+                bool ethAdded = false;
+
+                if (protocols.Count > 1 && protocols.ContainsKey(Protocol.Eth))
                 {
-                    _alphabetically[i++] = (protocolSession.Key, protocolSession.Value.MessageIdSpaceSize);
+                    _inOrderOfAdding[1] = (Protocol.Eth, protocols[Protocol.Eth].MessageIdSpaceSize);
+                    i++;
+                    ethAdded = true;
+                }
+                
+                foreach (KeyValuePair<string, IProtocolHandler> protocolSession
+                    in protocols.Where(kv => kv.Key != Protocol.P2P && (!ethAdded || kv.Key != Protocol.Eth)))
+                {
+                    _inOrderOfAdding[i++] = (protocolSession.Key, protocolSession.Value.MessageIdSpaceSize);
                 }
             }
 
             public (string, int) ResolveProtocol(int adaptiveId)
             {
                 int offset = 0;
-                for (int j = 0; j < _alphabetically.Length; j++)
+                for (int j = 0; j < _inOrderOfAdding.Length; j++)
                 {
-                    if (offset + _alphabetically[j].SpaceSize > adaptiveId)
+                    if (offset + _inOrderOfAdding[j].SpaceSize > adaptiveId)
                     {
-                        return (_alphabetically[j].ProtocolCode, adaptiveId - offset);
+                        (string ProtocolCode, int) data = (_inOrderOfAdding[j].ProtocolCode, adaptiveId - offset);
+
+                        if (data.ProtocolCode == Protocol.AA)
+                        {
+                            
+                        }
+                        return data;
                     }
 
-                    offset += _alphabetically[j].SpaceSize;
+                    offset += _inOrderOfAdding[j].SpaceSize;
                 }
 
                 // consider disconnecting on the breach of protocol here?
@@ -626,11 +641,11 @@ namespace Nethermind.Network.P2P
             public int ResolveAdaptiveId(string protocol, int messageCode)
             {
                 int offset = 0;
-                for (int j = 0; j < _alphabetically.Length; j++)
+                for (int j = 0; j < _inOrderOfAdding.Length; j++)
                 {
-                    if (_alphabetically[j].ProtocolCode == protocol)
+                    if (_inOrderOfAdding[j].ProtocolCode == protocol)
                     {
-                        if (_alphabetically[j].SpaceSize <= messageCode)
+                        if (_inOrderOfAdding[j].SpaceSize <= messageCode)
                         {
                             break;
                         }
@@ -638,7 +653,7 @@ namespace Nethermind.Network.P2P
                         return offset + messageCode;
                     }
 
-                    offset += _alphabetically[j].SpaceSize;
+                    offset += _inOrderOfAdding[j].SpaceSize;
                 }
 
                 throw new InvalidOperationException($"Registered protocols do not support {protocol}.{messageCode}");
