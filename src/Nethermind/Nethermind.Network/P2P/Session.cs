@@ -599,17 +599,9 @@ namespace Nethermind.Network.P2P
                 _inOrderOfAdding = new (string, int)[protocols.Count];
                 _inOrderOfAdding[0] = (Protocol.P2P, protocols[Protocol.P2P].MessageIdSpaceSize);
                 int i = 1;
-                bool ethAdded = false;
-
-                if (protocols.Count > 1 && protocols.ContainsKey(Protocol.Eth))
-                {
-                    _inOrderOfAdding[1] = (Protocol.Eth, protocols[Protocol.Eth].MessageIdSpaceSize);
-                    i++;
-                    ethAdded = true;
-                }
                 
                 foreach (KeyValuePair<string, IProtocolHandler> protocolSession
-                    in protocols.Where(kv => kv.Key != Protocol.P2P && (!ethAdded || kv.Key != Protocol.Eth)))
+                    in protocols.Where(kv => kv.Key != Protocol.P2P))
                 {
                     _inOrderOfAdding[i++] = (protocolSession.Key, protocolSession.Value.MessageIdSpaceSize);
                 }
