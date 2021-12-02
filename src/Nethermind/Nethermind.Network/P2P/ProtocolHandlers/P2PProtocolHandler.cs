@@ -107,11 +107,23 @@ namespace Nethermind.Network.P2P.ProtocolHandlers
                 {
                     Metrics.HellosReceived++;
                     HandleHello(Deserialize<HelloMessage>(msg.Data));
-                    
+
+                    List<Capability> caps = new List<Capability>();
                     foreach (Capability capability in
-                        _agreedCapabilities.GroupBy(c => c.ProtocolCode).Select(c => c.OrderBy(v => v.Version).Last()))
+                        _agreedCapabilities.OrderBy(c => c.ProtocolCode).GroupBy(c => c.ProtocolCode).Select(c => c.OrderBy(v => v.Version).Last()))
                     {
+                        caps.Add(capability);
                         if (Logger.IsTrace) Logger.Trace($"{Session} Starting protocolHandler for {capability.ProtocolCode} v{capability.Version} on {Session.RemotePort}");
+                        if (capability.Equals(new Capability("aa", 0)))
+                        {
+                            Logger.Warn($"{caps.Count}");
+                            Logger.Warn($"{capability.ProtocolCode}, {capability.Version}");
+                        }
+                        if (capability.Equals(new Capability("eth", 66)) && caps.Count > 1)
+                        {
+                            Logger.Warn($"{caps.Count}");
+                            Logger.Warn($"{capability.ProtocolCode}, {capability.Version}");
+                        }
                         SubprotocolRequested?.Invoke(this, new ProtocolEventArgs(capability.ProtocolCode, capability.Version));
                     }
 
